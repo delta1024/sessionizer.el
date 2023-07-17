@@ -3,8 +3,8 @@
 ;; Copyright (C) 2023 Jacob Stannix <jakestannix@gmail.com>
 
 ;; Author: Jacob Stannix <jakestannix@gmail.com>
-;; Version: 0.0.1
-;; Package-Requires: ()
+;; Version: 0.0.2
+;; Package-Requires: ((emacs "28.2") (perspective "2.18"))
 ;; Keywords: projects, sessions
 
 ;;; Commentary:
@@ -13,20 +13,31 @@
 ;; (found here: https://github.com/ThePrimeagen/.dotfiles/blob/master/bin/.local/scripts/tmux-sessionizer)
 ;; to work in emacs
 
-(provide 'emacs-sessionizer)
+;;; Code:
+(require 'perspective)
 
-(define-minor-mode emacs-sessinoizer-mode
-  "Toggle emacs-sessionizer-mode."
-  :init-value nil)
 
-(defgroup emacs-sessionizer nil
-  "customizations for the package `emacs-sessionizer'")
+;;; --- customization
 
+;;;###autoload
+(defgroup emacs-sessionizer 'nil
+  "customizations for the package `emacs-sessionizer'"
+  :group 'perspective-mode)
+
+;;;###autoload
 (defcustom emacs-sessionizer-search-list '()
   "list of directories to search to populate selection list."
   :type 'list
   :require 'emacs-sessionizer-mode
   :group 'emacs-sessionizer)
+
+;;;###autoload 
+(defcustom emacs-sessionizer-prefix-key (kbd "C-c s")
+  "Prefix key for `emacs-sessionizer-mode-map'"
+  :group 'emacs-sessionozer
+  :type 'key-sequence)
+
+;;; --- implementation
 
 (defun emacs-sessionizer--filter-dir-list (list)
   "Filters non directories from a dir list"
@@ -48,7 +59,43 @@
      (setq result-list (append (directory-files-and-attributes dir 't) result-list)))
     (emacs-sessionizer--filter-dir-list result-list)))
 
+(defvar emacs-sessionizer--cur-session 'nil)
+
+(defun emacs-sessionizer-choose-dir ()
+    (let ((list (emacs-sessionizer--build-dir-list)))
+      (completing-read
+       "Which Project: "
+       list
+       )))
+(defun emacs-sessionizer-switch-perspective ()
+  (interactive)
+  (let ((session-dir (emacs-sessionizer-choose-dir)))
+    (setq emacs-sessionizer--cur-session session-dir)
+    (persp-switch session-dir)))
+
+(defvar emacs-sessionizer-mode-map (make-sparse-keymap))
+
+(define-key emacs-sessionizer-mode-map emacs-sessionizer-prefix-key #'emacs-sessionizer-switch-perspective)
+
+(defun emacs-sessionizer--persp-switch-hook-function ()
+  (cd emacs-sessionizer--cur-session))
+
+(add-hook 'persp-switch-hook #'emacs-sessionizer--persp-switch-hook-function)
+
+;;;###autoload
+(define-minor-mode emacs-sessionizer-mode
+  "Toggle emacs-sessionizer-mode."
+  :global 't
+  :keymap emacs-sessionizer-mode-map
+  (if emacs-sessionizer-mode
+      (progn
+	(customize-set-variable 'persp-mode-prefix-key (kbd "C-c p"))
+	(persp-mode 1))
+    (progn
+      (persp-mode -1)))
+  )
 
 
-
-
+(provide 'emacs-sessionizer)
+;; (customize-set-variable 'emacs-sessionizer-search-list '("~/Projects" "~/.config"))
+;;; emacs-sessionizer.el ends here
