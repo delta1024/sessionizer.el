@@ -4,7 +4,7 @@
 
 ;; Author: Jacob Stannix <jakestannix@gmail.com>
 ;; Version: 0.0.2
-;; Package-Requires: ((emacs "28.2") (perspective "2.18"))
+;; Package-Requires: ((emacs "28.2") (perspective "2.18") (fzf "0.0.2")) 
 ;; Keywords: projects, sessions
 
 ;;; Commentary:
@@ -15,6 +15,7 @@
 
 ;;; Code:
 (require 'perspective)
+(require 'fzf)
 
 
 ;;; --- customization
@@ -61,17 +62,15 @@
 
 (defvar emacs-sessionizer--cur-session 'nil)
 
-(defun emacs-sessionizer-choose-dir ()
-    (let ((list (emacs-sessionizer--build-dir-list)))
-      (completing-read
-       "Which Project: "
-       list
-       )))
+
+(defun emacs-sessionizer-fzf-callback (session-dir)
+      (setq emacs-sessionizer--cur-session session-dir)
+    (persp-switch session-dir)
+  )
 (defun emacs-sessionizer-switch-perspective ()
   (interactive)
-  (let ((session-dir (emacs-sessionizer-choose-dir)))
-    (setq emacs-sessionizer--cur-session session-dir)
-    (persp-switch session-dir)))
+  (fzf-with-entries (emacs-sessionizer--build-dir-list) 'emacs-sessionizer-fzf-callback)
+)
 
 (defvar emacs-sessionizer-mode-map (make-sparse-keymap))
 
