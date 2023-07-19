@@ -96,5 +96,4 @@
 
 
 (provide 'emacs-sessionizer)
-;; (customize-set-variable 'emacs-sessionizer-search-list '("~/Projects" "~/.config"))
 ;;; emacs-sessionizer.el ends here
