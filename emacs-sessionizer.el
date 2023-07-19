@@ -3,7 +3,7 @@
 ;; Copyright (C) 2023 Jacob Stannix <jakestannix@gmail.com>
 
 ;; Author: Jacob Stannix <jakestannix@gmail.com>
-;; Version: 0.0.2
+;; Version: 0.0.4
 ;; Package-Requires: ((emacs "28.2") (perspective "2.18") (fzf "0.0.2")) 
 ;; Keywords: projects, sessions
 
@@ -67,8 +67,8 @@
   (cd session-dir)
   (persp-switch session-dir))
 
-(defun emacs-sessionizer-switch-perspective ()
-  (interactive)
+(defun emacs-sessionizer-switch-perspective () 
+ (interactive)
   (fzf-with-entries (emacs-sessionizer--build-dir-list) 'emacs-sessionizer-fzf-callback))
 
 (defvar emacs-sessionizer-mode-map (make-sparse-keymap))
