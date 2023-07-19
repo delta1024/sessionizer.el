@@ -60,12 +60,13 @@
      (setq result-list (append (directory-files-and-attributes dir 't) result-list)))
     (emacs-sessionizer--filter-dir-list result-list)))
 
-(defvar emacs-sessionizer--cur-session 'nil)
+;;(defvar emacs-sessionizer--cur-session 'nil)
 
 
 (defun emacs-sessionizer-fzf-callback (session-dir)
-      (setq emacs-sessionizer--cur-session session-dir)
-    (persp-switch session-dir)
+;;  (setq emacs-sessionizer--cur-session session-dir)
+  (cd session-dir)
+  (persp-switch session-dir)
   )
 (defun emacs-sessionizer-switch-perspective ()
   (interactive)
@@ -76,10 +77,10 @@
 
 (define-key emacs-sessionizer-mode-map emacs-sessionizer-prefix-key #'emacs-sessionizer-switch-perspective)
 
-(defun emacs-sessionizer--persp-switch-hook-function ()
-  (cd emacs-sessionizer--cur-session))
+;; (defun emacs-sessionizer--persp-switch-hook-function ()
+;;   (cd emacs-sessionizer--cur-session))
 
-(add-hook 'persp-switch-hook #'emacs-sessionizer--persp-switch-hook-function)
+;;(add-hook 'persp-switch-hook #'emacs-sessionizer--persp-switch-hook-function)
 
 ;;;###autoload
 (define-minor-mode emacs-sessionizer-mode
@@ -96,5 +97,4 @@
 
 
 (provide 'emacs-sessionizer)
-;; (customize-set-variable 'emacs-sessionizer-search-list '("~/Projects" "~/.config"))
 ;;; emacs-sessionizer.el ends here
