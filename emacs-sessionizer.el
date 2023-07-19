@@ -62,25 +62,33 @@
      (setq result-list (append (directory-files-and-attributes dir 't) result-list)))
     (emacs-sessionizer--filter-dir-list result-list)))
 
+(defvar emacs-sessionizer--cur-session 'nil)
 
 (defun emacs-sessionizer-fzf-callback (session-dir)
-  (cd session-dir)
+  (setq emacs-sessionizer--cur-session session-dir)
   (persp-switch session-dir))
 
 (defun emacs-sessionizer-switch-perspective () 
  (interactive)
-  (fzf-with-entries (emacs-sessionizer--build-dir-list) 'emacs-sessionizer-fzf-callback))
+  (fzf-with-entries (emacs-sessionizer--build-dir-list) #'emacs-sessionizer-fzf-callback))
 
 (defvar emacs-sessionizer-mode-map (make-sparse-keymap))
 
 (define-key emacs-sessionizer-mode-map emacs-sessionizer-prefix-key #'emacs-sessionizer-switch-perspective)
-
+(defun emacs-sessionizer--persp-switch-hook-function ()
+  (cd emacs-sessionizer--cur-session))
 ;;;###autoload
 (define-minor-mode emacs-sessionizer-mode
   "Toggle emacs-sessionizer-mode."
   :global 't
   :keymap emacs-sessionizer-mode-map
-  (persp-mode))
+  (progn
+    (if emacs-sessionizer-mode
+      (progn
+	(add-hook 'persp-switch-hook #'emacs-sessionizer--persp-switch-hook-function))
+    (progn
+      (remove-hook 'persp-switch-hook #'emacs-sessionizer--persp-switch-hook-function)))
+  (persp-mode)))
 
 (provide 'emacs-sessionizer)
 ;;; emacs-sessionizer.el ends here
