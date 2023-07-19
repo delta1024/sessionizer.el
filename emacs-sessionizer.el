@@ -7,6 +7,8 @@
 ;; Package-Requires: ((emacs "28.2") (perspective "2.18") (fzf "0.0.2")) 
 ;; Keywords: projects, sessions
 
+;; This file is not part of GNU Emacs.
+
 ;;; Commentary:
 
 ;; This package is a rewrite of ThePrimeagen's tmux-sessionizer
@@ -33,7 +35,7 @@
   :group 'emacs-sessionizer)
 
 ;;;###autoload 
-(defcustom emacs-sessionizer-prefix-key (kbd "C-c s")
+(defcustom emacs-sessionizer-prefix-key 'nil 
   "Prefix key for `emacs-sessionizer-mode-map'"
   :group 'emacs-sessionozer
   :type 'key-sequence)
@@ -60,41 +62,25 @@
      (setq result-list (append (directory-files-and-attributes dir 't) result-list)))
     (emacs-sessionizer--filter-dir-list result-list)))
 
-;;(defvar emacs-sessionizer--cur-session 'nil)
-
 
 (defun emacs-sessionizer-fzf-callback (session-dir)
-;;  (setq emacs-sessionizer--cur-session session-dir)
   (cd session-dir)
-  (persp-switch session-dir)
-  )
+  (persp-switch session-dir))
+
 (defun emacs-sessionizer-switch-perspective ()
   (interactive)
-  (fzf-with-entries (emacs-sessionizer--build-dir-list) 'emacs-sessionizer-fzf-callback)
-)
+  (fzf-with-entries (emacs-sessionizer--build-dir-list) 'emacs-sessionizer-fzf-callback))
 
 (defvar emacs-sessionizer-mode-map (make-sparse-keymap))
 
 (define-key emacs-sessionizer-mode-map emacs-sessionizer-prefix-key #'emacs-sessionizer-switch-perspective)
-
-;; (defun emacs-sessionizer--persp-switch-hook-function ()
-;;   (cd emacs-sessionizer--cur-session))
-
-;;(add-hook 'persp-switch-hook #'emacs-sessionizer--persp-switch-hook-function)
 
 ;;;###autoload
 (define-minor-mode emacs-sessionizer-mode
   "Toggle emacs-sessionizer-mode."
   :global 't
   :keymap emacs-sessionizer-mode-map
-  (if emacs-sessionizer-mode
-      (progn
-	(customize-set-variable 'persp-mode-prefix-key (kbd "C-c p"))
-	(persp-mode 1))
-    (progn
-      (persp-mode -1)))
-  )
-
+  (persp-mode))
 
 (provide 'emacs-sessionizer)
 ;;; emacs-sessionizer.el ends here
